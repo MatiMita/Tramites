@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Consulta de Trámites | Panel de Control</title>
+    <meta name="description" content="Sistema de consulta y visualización de trámites">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h1>Sistema de Consulta de Trámites</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <div class="filters-header">
+                    <h2>Buscar Trámites</h2>
+                    <button class="btn-text" id="clearFiltersBtn">Limpiar búsqueda</button>
+                </div>
+                <div class="filters-grid-centered">
+                    <div class="filter-group">
+                        <div class="search-input-wrapper">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.35-4.35" />
+                            </svg>
+                            <input type="text" id="searchFilter" class="search-input"
+                                placeholder="Buscar por ID, CITE, observación o ubicación...">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stat-card stat-card-inicio">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 6v6l4 2" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">En Inicio</p>
+                        <p class="stat-value" id="statInicio">0</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-proceso">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">En Proceso</p>
+                        <p class="stat-value" id="statProceso">0</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-finalizado">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Finalizados</p>
+                        <p class="stat-value" id="statFinalizado">0</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-total">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Trámites</p>
+                        <p class="stat-value" id="statTotal">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tramites List -->
+            <section class="tramites-section">
+                <div class="section-header">
+                    <h2>Trámites</h2>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid" id="gridViewBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                        </button>
+                        <button class="view-btn" data-view="list" id="listViewBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6" />
+                                <line x1="8" y1="12" x2="21" y2="12" />
+                                <line x1="8" y1="18" x2="21" y2="18" />
+                                <line x1="3" y1="6" x2="3.01" y2="6" />
+                                <line x1="3" y1="12" x2="3.01" y2="12" />
+                                <line x1="3" y1="18" x2="3.01" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="tramites-grid" id="tramitesContainer">
+                    <!-- Tramites will be rendered here -->
+                </div>
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3>No hay trámites</h3>
+                    <p>Realiza una búsqueda para encontrar trámites</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal for Tramite Details -->
+    <div class="modal" id="detallesModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <div>
+                    <h2 id="detallesModalTitle">Detalles del Trámite</h2>
+                    <p id="detallesModalSubtitle" class="modal-subtitle"></p>
+                </div>
+                <button class="modal-close" id="closeDetallesModalBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Información Completa del Trámite -->
+            <div class="tramite-info-section" id="tramiteInfoSection">
+                <!-- Se llenará dinámicamente con TODAS las columnas -->
+            </div>
+
+            <!-- Historial de Detalles -->
+            <div class="detalles-section">
+                <div class="section-header-inline">
+                    <h3>Historial de Movimientos</h3>
+                </div>
+                <div class="detalles-timeline" id="detallesTimeline">
+                    <!-- Se llenará dinámicamente con TODAS las columnas de cada detalle -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
