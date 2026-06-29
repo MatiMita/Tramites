@@ -11,7 +11,7 @@ const pool = new Pool({
 });
 
 
-const schema = 'public';
+const schema = process.env.DB_SCHEMA || 'public';
 
 
 pool.on('connect', (client) => {
@@ -28,12 +28,24 @@ pool.on('error', (err) => {
 async function initializeDatabase() {
     const client = await pool.connect();
     try {
-        // Establecer el schema
-        await client.query(`SET search_path TO public`);
+        await client.query(`SET search_path TO ${schema}`);
 
-        // Las tablas tramites y tramites_detalle ya existen
-        // Solo verificamos la conexión
-        console.log(`✅ Conectado al schema public - Tablas tramites y tramites_detalle listas`);
+        const tablesResult = await client.query(
+            `SELECT table_name
+             FROM information_schema.tables
+             WHERE table_schema = $1
+               AND table_name IN ('tramites', 'tramites_detalle')
+             ORDER BY table_name`,
+            [schema]
+        );
+
+        const tables = tablesResult.rows.map((row) => row.table_name);
+
+        if (tables.length !== 2) {
+            throw new Error(`No se encontraron las tablas tramites y tramites_detalle en el schema ${schema}`);
+        }
+
+        console.log(`✅ Conectado al schema ${schema} - Tablas ${tables.join(' y ')} listas`);
     } catch (error) {
         console.error('❌ Error al verificar la base de datos:', error);
         throw error;

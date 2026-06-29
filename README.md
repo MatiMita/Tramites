@@ -1,50 +1,40 @@
 # Sistema de Gestión de Trámites
 
-Sistema web moderno para gestionar trámites usando las tablas `public.tramites` y `public.tramites_detalle` en PostgreSQL.
+Aplicación Node.js con PostgreSQL 15 para consultar trámites desde `public.tramites` y `public.tramites_detalle`.
 
-## Estructura de Base de Datos
+## Esquema Actual
 
-### Tabla Principal: `public.tramites`
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| id_tramite | SERIAL | ID único del trámite (PK) |
-| id_tipo_tramite | INTEGER | ID del tipo de trámite |
-| cite_tramite | VARCHAR | CITE del trámite |
-| id_documento | INTEGER | ID del documento asociado |
-| estado_tramite | VARCHAR | Estado: inicio, proceso, finalizado |
-| id_funcionario | INTEGER | ID del funcionario asignado |
-| ubicacion | VARCHAR | Ubicación del trámite |
-| fojas | INTEGER | Número de fojas |
-| num_resolucion | INTEGER | Número de resolución |
-| fecha_resolucion | DATE | Fecha de resolución |
-| observacion | VARCHAR(300) | Observaciones del trámite |
-| created_at | TIMESTAMP | Fecha de creación |
-| updated_at | TIMESTAMP | Fecha de actualización |
-
-### Tabla Detalle: `public.tramites_detalle`
+### `public.tramites`
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| cite_tramite | VARCHAR | CITE del trámite |
-| descripcion | VARCHAR | Descripción del movimiento |
-| estado_reg | VARCHAR | Estado del registro (activo/inactivo) |
-| estado_tramite | VARCHAR | Estado del trámite |
-| id_tramite | INTEGER | ID del trámite (FK) |
-| cargo | VARCHAR | Cargo del funcionario |
-| email_empresa | VARCHAR | Email de la empresa/funcionario |
+| id_tramite | integer | Identificador del trámite |
+| cite_tramite | varchar | CITE del trámite |
+| estado_tramite | varchar | Estado operativo del trámite |
+| estado_reg | varchar | Estado de registro |
+| observacion | varchar | Observaciones |
+| num_resolucion | integer | Número de resolución |
+| nombre_tramite | varchar | Nombre del trámite |
+| nombre_completo2 | text | Nombre completo |
+| tipo_persona | varchar | Tipo de persona |
 
-## 🚀 Instalación y Configuración
+### `public.tramites_detalle`
 
-### Paso 1: Instalar Dependencias
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| cite_tramite | varchar | CITE relacionado |
+| descripcion | varchar | Descripción del movimiento |
+| estado_reg | varchar | Estado del registro |
+| estado_tramite | varchar | Estado del trámite |
+| id_tramite | integer | FK hacia `public.tramites` |
+| cargo | varchar | Cargo asociado |
+| email_empresa | varchar | Correo asociado |
 
-```bash
-npm install
-```
+## Configuración
 
-### Paso 2: Configurar PostgreSQL
+Instala dependencias con `npm install`, configura `.env` y ejecuta `npm start`.
 
-Edita el archivo `.env` con tus credenciales:
+Variables soportadas:
 
 ```env
 DB_HOST=localhost
@@ -56,97 +46,19 @@ DB_SCHEMA=public
 PORT=3000
 ```
 
-### Paso 3: Iniciar el Servidor
+## API
 
-```bash
-npm start
-```
+Rutas disponibles:
 
-### Paso 4: Abrir la Aplicación
+- `GET /api/tramites`
+- `GET /api/tramites/:id`
+- `DELETE /api/tramites/:id`
+- `GET /api/estadisticas`
+- `GET /api/funcionarios`
 
-```
-http://localhost:3000
-```
+`GET /api/tramites` acepta `search`, `estado` y `funcionario` como query params. La búsqueda trabaja contra los campos actuales de ambas tablas.
 
-## 📚 API Endpoints
+## Notas
 
-### Trámites
-
-- `GET /api/tramites` - Obtener todos los trámites
-  - Query params: `?estado=inicio&funcionario=1&search=CITE-001`
-- `GET /api/tramites/:id` - Obtener un trámite con sus detalles
-- `POST /api/tramites` - Crear un nuevo trámite
-- `PUT /api/tramites/:id` - Actualizar un trámite
-- `DELETE /api/tramites/:id` - Eliminar un trámite
-
-### Detalles
-
-- `POST /api/tramites/:id/detalles` - Agregar un detalle a un trámite
-
-### Estadísticas
-
-- `GET /api/estadisticas` - Obtener contadores por estado
-- `GET /api/funcionarios` - Obtener lista de funcionarios únicos
-
-## 🔍 Búsqueda
-
-El sistema permite buscar por:
-- ✅ **ID del trámite** - Ej: "1", "25"
-- ✅ **CITE** - Ej: "CITE-2025-001"
-- ✅ **Observación** - Cualquier texto en observaciones
-- ✅ **Ubicación** - Ubicación del trámite
-
-## 📝 Ejemplo de Uso
-
-### Crear un Trámite
-
-```json
-POST /api/tramites
-{
-  "id_tipo_tramite": 1,
-  "cite_tramite": "CITE-2025-001",
-  "estado_tramite": "inicio",
-  "id_funcionario": 5,
-  "ubicacion": "Oficina Central",
-  "fojas": 10,
-  "observacion": "Trámite urgente"
-}
-```
-
-### Agregar un Detalle
-
-```json
-POST /api/tramites/1/detalles
-{
-  "id_funcionario": 5,
-  "num_informe": "INF-001",
-  "estado_tramite": "proceso",
-  "descripcion": "Revisión inicial completada",
-  "id_tipo_tramite": 1
-}
-```
-
-## 🎨 Características
-
-- ✅ Interfaz moderna con tema oscuro
-- ✅ Búsqueda en tiempo real
-- ✅ Filtros por estado
-- ✅ Estadísticas en tiempo real
-- ✅ CRUD completo de trámites
-- ✅ Diseño responsive
-- ✅ Persistencia en PostgreSQL (schema public)
-- ✅ Sincronización automática con triggers entre tramites y tramites_detalle
-- ✅ Búsqueda por ID y CITE
-- ✅ API REST completa
-- ✅ Relación entre trámites y detalles
-
-## 🔒 Seguridad
-
-- El archivo `.env` está en `.gitignore`
-- Usa variables de entorno para credenciales
-- Validación de datos en el backend
-- Transacciones para operaciones críticas
-
-## 📄 Licencia
-
-ISC
+- El frontend sigue consumiendo las mismas rutas.
+- El backend ya no contiene referencias a tablas antiguas ni a columnas obsoletas.
