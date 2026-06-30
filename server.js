@@ -18,7 +18,7 @@ const TRAMITE_SEARCHABLE_COLUMNS = [
 const DETALLE_SEARCHABLE_COLUMNS = [
     'd.cite_tramite',
     'd.descripcion',
-    'd.estado_tramite',
+    'd.estado_reg',
     'd.cargo',
     'd.email_empresa'
 ];
@@ -71,7 +71,6 @@ async function fetchTramiteConDetalles(id) {
     d.cite_tramite,
     d.descripcion,
     d.estado_reg,
-    d.estado_tramite,
     d.cargo,
     d.email_empresa
          FROM public.tramites_detalle d
@@ -155,7 +154,6 @@ FROM public.tramites t
                 d.cite_tramite,
                 d.descripcion,
                 d.estado_reg,
-                d.estado_tramite,
                 d.cargo,
                 d.email_empresa
              FROM public.tramites_detalle d
