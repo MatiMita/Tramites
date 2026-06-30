@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { pool, initializeDatabase } = require('./database');
+const { pool, initializeDatabase, schema } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -289,11 +289,11 @@ async function startServer() {
 
         // Iniciar el servidor
         app.listen(PORT, () => {
-            console.log(`\n🚀 Servidor corriendo en http://localhost:${PORT}`);
-            console.log(`📊 API disponible en http://localhost:${PORT}/api/tramites`);
-            console.log(`📋 Schema: ${process.env.DB_SCHEMA || 'public'}`);
-            console.log(`🔍 Búsqueda habilitada por campos actuales de tramites y tramites_detalle`);
-            console.log(`\n💡 Presiona Ctrl+C para detener el servidor\n`);
+            console.log(`\n Servidor corriendo en http://localhost:${PORT}`);
+            console.log(` API disponible en http://localhost:${PORT}/api/tramites`);
+            console.log(` Schema: ${schema}`);
+            console.log(` Búsqueda habilitada por campos actuales de tramites y tramites_detalle`);
+            console.log(`\n Presiona Ctrl+C para detener el servidor\n`);
         });
     } catch (error) {
         console.error('❌ Error al iniciar el servidor:', error);

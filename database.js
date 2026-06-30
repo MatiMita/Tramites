@@ -1,57 +1,81 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-
 const pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'tramites_db',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
 });
-
 
 const schema = process.env.DB_SCHEMA || 'public';
 
+pool.on('connect', async (client) => {
+    console.log('✅ Conectado a PostgreSQL');
 
-pool.on('connect', (client) => {
-    console.log('✅ Conectado a la base de datos PostgreSQL');
-   
-    client.query(`SET search_path TO public`);
+    try {
+        await client.query(`SET search_path TO ${schema}`);
+    } catch (err) {
+        console.error(err);
+    }
 });
 
 pool.on('error', (err) => {
-    console.error('❌ Error en la conexión a PostgreSQL:', err);
+    console.error('❌ Error PostgreSQL:', err.message);
 });
 
-// Función para inicializar la base de datos (crear tablas si no existen)
 async function initializeDatabase() {
+
     const client = await pool.connect();
+
     try {
+
         await client.query(`SET search_path TO ${schema}`);
 
-        const tablesResult = await client.query(
-            `SELECT table_name
-             FROM information_schema.tables
-             WHERE table_schema = $1
-               AND table_name IN ('tramites', 'tramites_detalle')
-             ORDER BY table_name`,
-            [schema]
-        );
+        // Verificar conexión
+        const db = await client.query(`
+            SELECT
+                current_database() AS database,
+                current_user AS usuario,
+                current_schema() AS schema
+        `);
 
-        const tables = tablesResult.rows.map((row) => row.table_name);
+        console.log('===============================');
+        console.log('Base de datos:', db.rows[0].database);
+        console.log('Usuario:', db.rows[0].usuario);
+        console.log('Schema:', db.rows[0].schema);
 
-        if (tables.length !== 2) {
-            throw new Error(`No se encontraron las tablas tramites y tramites_detalle en el schema ${schema}`);
-        }
+        // Mostrar tablas existentes
+        const tablas = await client.query(`
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema='public'
+            ORDER BY table_name
+        `);
 
-        console.log(`✅ Conectado al schema ${schema} - Tablas ${tables.join(' y ')} listas`);
-    } catch (error) {
-        console.error('❌ Error al verificar la base de datos:', error);
-        throw error;
+        console.log('Tablas encontradas:');
+
+        tablas.rows.forEach((t) => {
+            console.log(' -', t.table_name);
+        });
+
+        console.log('===============================');
+
+        console.log('✅ Base de datos inicializada correctamente');
+
+    } catch (err) {
+
+        console.error(err);
+
+        throw err;
+
     } finally {
+
         client.release();
+
     }
+
 }
 
 module.exports = {
