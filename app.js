@@ -1,7 +1,7 @@
 // ===================================
 // API Client
 // ===================================
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'http://167.114.113.202:3000/api';
 
 class APIClient {
     async getTramites(filters = {}) {
