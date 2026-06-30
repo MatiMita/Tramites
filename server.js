@@ -8,19 +8,17 @@ const PORT = process.env.PORT || 3000;
 const TRAMITE_SEARCHABLE_COLUMNS = [
     't.id_tramite::text',
     't.cite_tramite',
-    't.nombre_tramite',
-    't.nombre_completo2',
-    't.tipo_persona',
     't.estado_tramite',
-    't.estado_reg',
-    't.observacion'
+    't.observacion',
+    't.num_resolucion::text',
+    't.id_tipo_tramite::text',
+    't.id_funcionario::text'
 ];
 
 const DETALLE_SEARCHABLE_COLUMNS = [
     'd.cite_tramite',
     'd.descripcion',
     'd.estado_tramite',
-    'd.estado_reg',
     'd.cargo',
     'd.email_empresa'
 ];
@@ -47,15 +45,17 @@ function buildSearchWhereClause() {
 async function fetchTramiteConDetalles(id) {
     const tramiteResult = await pool.query(
         `SELECT
-            t.id_tramite,
-            t.cite_tramite,
-            t.nombre_tramite,
-            t.nombre_completo2,
-            t.tipo_persona,
-            t.estado_tramite,
-            t.estado_reg,
-            t.observacion,
-            t.num_resolucion
+         t.id_tramite,
+         t.id_tipo_tramite,
+         t.cite_tramite,
+         t.id_documento,
+         t.estado_tramite,
+         t.id_funcionario,
+         t.ubicacion,
+         t.fojas,
+         t.num_resolucion,
+         t.fecha_resolucion,
+         t.observacion
          FROM public.tramites t
          WHERE t.id_tramite = $1`,
         [id]
@@ -67,13 +67,13 @@ async function fetchTramiteConDetalles(id) {
 
     const detallesResult = await pool.query(
         `SELECT
-            d.id_tramite,
-            d.cite_tramite,
-            d.descripcion,
-            d.estado_reg,
-            d.estado_tramite,
-            d.cargo,
-            d.email_empresa
+    d.id_tramite,
+    d.cite_tramite,
+    d.descripcion,
+    d.estado_reg,
+    d.estado_tramite,
+    d.cargo,
+    d.email_empresa
          FROM public.tramites_detalle d
          WHERE d.id_tramite = $1
          ORDER BY d.id_tramite DESC, d.cite_tramite ASC, d.descripcion ASC`,
@@ -127,16 +127,18 @@ app.get('/api/tramites', async (req, res) => {
 
         const tramitesResult = await pool.query(
             `SELECT
-                t.id_tramite,
-                t.cite_tramite,
-                t.nombre_tramite,
-                t.nombre_completo2,
-                t.tipo_persona,
-                t.estado_tramite,
-                t.estado_reg,
-                t.observacion,
-                t.num_resolucion
-             FROM public.tramites t
+    t.id_tramite,
+    t.id_tipo_tramite,
+    t.cite_tramite,
+    t.id_documento,
+    t.estado_tramite,
+    t.id_funcionario,
+    t.ubicacion,
+    t.fojas,
+    t.num_resolucion,
+    t.fecha_resolucion,
+    t.observacion
+FROM public.tramites t
              ${whereClause}
              ORDER BY t.id_tramite DESC`,
             values
@@ -216,9 +218,11 @@ app.delete('/api/tramites/:id', async (req, res) => {
         );
 
         const result = await client.query(
-            `DELETE FROM public.tramites WHERE id_tramite = $1 RETURNING id_tramite, cite_tramite, nombre_tramite, nombre_completo2, tipo_persona, estado_tramite, estado_reg, observacion, num_resolucion`,
-            [id]
-        );
+    `DELETE FROM public.tramites
+     WHERE id_tramite = $1
+     RETURNING *`,
+    [id]
+);
 
         if (result.rows.length === 0) {
             await client.query('ROLLBACK');
